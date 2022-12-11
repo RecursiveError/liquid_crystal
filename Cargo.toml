@@ -1,0 +1,13 @@
+[package]
+name = "liquid_crystal"
+authors = ["guilherme Silva Schultz <guilhermeSschultz.contato@gmail.com>"]
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+embedded-hal = "0.2.7"
+nb = "1"
+
+[toolchain]
+channel = "nightly"
