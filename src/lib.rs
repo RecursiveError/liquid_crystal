@@ -46,6 +46,23 @@ impl<'interface,T> LiquidCristal<'interface,T>
         LiquidCristal{interface}
     }
 
+    //envia os dados em 2 pacotes de 4bits
+    fn send4bits<D: DelayUs<u16>>(&mut self, delay: &mut D, data:u8){
+        self.interface.send(data);
+        self.interface.send(data | EN);
+        delay.delay_us(5);
+        self.interface.send(data);
+        delay.delay_us(5);
+    }
+
+    //trata os bits antes de enviar para send4bits
+    fn send<D: DelayUs<u16>>(&mut self,delay: &mut D,  data:u8, rs_state: u8){
+        let high_bits = ((data) & 0xF0) | rs_state;
+        let low_bits = ((data << 4) & 0xF0) | rs_state; 
+        self.send4bits(delay, high_bits);
+        self.send4bits(delay, low_bits);
+    }
+
     //envia dados para o LiquidCristal
     pub fn write<'s, D:DelayUs<u16>>(&mut self,delay: &mut D, data: SendType<'s>) -> &mut Self{
         match data {
@@ -63,22 +80,6 @@ impl<'interface,T> LiquidCristal<'interface,T>
         self
     }
 
-    //envia os dados em 2 pacotes de 4bits
-    fn send4bits<D: DelayUs<u16>>(&mut self, delay: &mut D, data:u8){
-        self.interface.send(data);
-        self.interface.send(data | EN);
-        delay.delay_us(5);
-        self.interface.send(data);
-        delay.delay_us(5);
-    }
-
-    //trata os bits antes de enviar para send4bits
-    fn send<D: DelayUs<u16>>(&mut self,delay: &mut D,  data:u8, rs_state: u8){
-        let high_bits = ((data) & 0xF0) | rs_state;
-        let low_bits = ((data << 4) & 0xF0) | rs_state; 
-        self.send4bits(delay, high_bits);
-        self.send4bits(delay, low_bits);
-    }
     //inicia o LiquidCristal
     pub fn init<D: DelayUs<u16>>(&mut self, delay: &mut D) -> &mut Self{
         //inicia o modo 4bits
