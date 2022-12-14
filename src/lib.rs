@@ -101,9 +101,9 @@ impl<'interface,T> LiquidCristal<'interface,T>
 
     pub fn set_cursor<D: DelayUs<u16>>(&mut self, delay: &mut D,line: u8, colum: u8) -> &mut Self{
         let bits = if line == 1{
-            (MoveLine1 as u8) & (0b0011_1111 & colum)
+            (MoveLine1 as u8) + (0b0011_1111 & colum)
         }else{
-            (MoveLine1 as u8) & (0b0011_1111 & colum)
+            (MoveLine2 as u8) + (0b0011_1111 & colum)
         }; 
 
         self.send(delay,bits, 0x00);
