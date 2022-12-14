@@ -6,6 +6,7 @@ pub use interfaces::*;
 use embedded_hal::blocking::delay::DelayUs;
 
 //TODO: set all functions code
+#[repr(u8)]
 pub enum Commands{
     Clear = 0x01,
     EntryMode = 0x06,
@@ -14,7 +15,9 @@ pub enum Commands{
     Fun4bits2line = 0x28,
     CursorOn = 0x0E,
     CursorOff = 0x0C,
-    MoveLine2 = 0b11000000,
+    MoveLine1 = 0x80,
+    MoveLine2 = 0xC0,
+
 }
 pub use Commands::*;
 
@@ -77,7 +80,7 @@ impl<'interface,T> LiquidCristal<'interface,T>
         self.send4bits(delay, low_bits);
     }
     //inicia o LiquidCristal
-    pub fn init<D: DelayUs<u16>>(&mut self, delay: &mut D){
+    pub fn init<D: DelayUs<u16>>(&mut self, delay: &mut D) -> &mut Self{
         //inicia o modo 4bits
         self.send4bits(delay, 0x03 << 4); 
         delay.delay_us(5000);
@@ -91,7 +94,18 @@ impl<'interface,T> LiquidCristal<'interface,T>
         //configura o LiquidCristal
         self.write(delay, SendType::Command(Fun4bits2line))
             .write(delay, SendType::Command(CursorOff))
-            .write(delay, SendType::Command(Clear));
+            .write(delay, SendType::Command(Clear))
+    }
+
+    pub fn set_cursor<D: DelayUs<u16>>(&mut self, delay: &mut D,line: u8, colum: u8) -> &mut Self{
+        let bits = if line == 1{
+            (MoveLine1 as u8) & (0b0011_1111 & colum)
+        }else{
+            (MoveLine1 as u8) & (0b0011_1111 & colum)
+        }; 
+
+        self.send(delay,bits, 0x00);
+        self
     }
 
 
