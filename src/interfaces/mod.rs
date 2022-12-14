@@ -1,5 +1,6 @@
-#![allow(unused_results)]
+#![allow(unused)]
 use embedded_hal::digital::v2::OutputPin;
+use embedded_hal::blocking::i2c::Write;
 
 pub const EN:u8 = 0b00000100;
 pub const _RW:u8 = 0b00000010;// NO READ FUNCTION
@@ -102,3 +103,21 @@ where
         }
 
     }
+
+struct I2C<T: Write>{
+    i2c_bus: T,
+    addr: u8,
+}
+
+impl<T: Write> I2C<T> {
+    fn new(i2c_bus:T, addr: u8) -> I2C<T>{
+        I2C {i2c_bus, addr}
+    }
+}
+
+impl<T: Write> Interface for I2C<T> {
+    fn send(&mut self, data:u8) {
+        self.i2c_bus.write(self.addr, &[data]);
+    }
+}
+
