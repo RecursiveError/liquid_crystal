@@ -15,6 +15,7 @@ pub enum Commands{
     Fun4bits2line = 0x28,
     CursorOn = 0x0E,
     CursorOff = 0x0C,
+    CursorBlink = 0x0F,
     MoveLine1 = 0x80,
     MoveLine2 = 0xC0,
 
