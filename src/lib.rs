@@ -60,7 +60,7 @@ impl<'interface,T> LiquidCristal<'interface,T>
     }
 
     //trata os bits antes de enviar para send4bits
-    fn send<D: DelayUs<u16>>(&mut self,delay: &mut D,  data:u8, rs_state: u8){
+    pub fn send<D: DelayUs<u16>>(&mut self,delay: &mut D,  data:u8, rs_state: u8){
         let high_bits = ((data) & 0xF0) | rs_state;
         let low_bits = ((data << 4) & 0xF0) | rs_state; 
         self.send4bits(delay, high_bits);
