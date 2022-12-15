@@ -8,12 +8,13 @@ features:
 - does not borrow the Delay function
 - easily extensible
 - user-friend 
+
 ## How to use
 
 #### first steps
 
 First you must choose a display communication interface, this library provides two built-in interfaces, parallel and I2C
-(you can create your own interfaces, [see here](#creating-your-interface) ), then just pass the interface to the display
+(you can create your own interfaces, [see here](#creating-your-own-interface) ), then just pass the interface to the display
 
 ```rust
     let mut lcd_interface = Parallel::new(D4, D5, D6, D7, rs, en);
@@ -23,7 +24,17 @@ First you must choose a display communication interface, this library provides t
 #### sending commands and text
 (this may change in the future, [see here](why-this-API?) )
 
-you can send text commands by the "write" function, this function receives a reference from a  delay function and an Enum "SendType" which can be Text or Command
+first you must configure the display.
+
+for this you must call the "init" function and then "fast_config", the "fast_config" function receives a configuration struct as an argument, this library comes with one by default, but you can create your own. [see here](#fastconfig)
+(you can configure directly with the low level "send" function, not recommended if you don't know how to configure the HD44780)
+
+```rust
+    lcd.init(&mut delay);
+    lcd.fast_config(&mut delay, DEFALT_CONFIG);
+```
+
+you can send text and commands by the "write" function, this function receives a reference from a  delay function and an Enum "SendType" which can be Text or Command
 
 to send a text, pass a &str to the "Text" variant
 
@@ -49,6 +60,7 @@ use liquid_crystal::{Commands, SendType , LiquidCristal};
 use Commands::*;
 use SendType::*;
 use liquid_crystal::Parallel;
+use liquid_crystal::DEFALT_CONFIG;
 
 #[entry]
 fn main() -> ! {
@@ -76,6 +88,8 @@ fn main() -> ! {
     let mut lcd = LiquidCristal::new(&mut lcd_interface);
     
     lcd.init(&mut delay);
+    lcd.fast_config(&mut delay, DEFALT_CONFIG);
+    
     lcd.write(&mut delay,Text("hello World!"))
         .write(&mut delay,Command(MoveLine2))
         .write(&mut delay,Text("made in Rust!!!"));
@@ -84,7 +98,7 @@ fn main() -> ! {
 ```
 
 
-## creating your interface
+## creating your own interface
 
 to create your own interface, you must implement the "Interface" Trait which contains the "send" function
 
@@ -119,6 +133,27 @@ connect the bits to their respective ports, and congratulations you have created
 - CursorBlink
 - MoveLine1
 - MoveLine2
+
+(working on the documentation for the commands)
+
+## FastConfig
+"FastConfig" is a struct that contains the display configuration
+
+```rust
+    struct FastConfig{
+    pub entry_mode: (ShiftConfig, ShiftState),
+    pub display: (Display, Cursor, Blink),
+    pub display_config: (Bits,DisplayLines,CharSize),
+    pub write_config: (ShiftMode, ShiftDirection)
+    }
+```
+
+each attribute corresponds to a type of configuration (defined in the HD44780 manual)
+
+choose a variant from each configuration enum to create a display configuration
+
+(working on documentation for the Enums)
+
 ## why this API?
 
 I use lcd display for a long time, and I always had to rewrite the Drive when I need to use some port expander, because the current APIs don't provide a simple way to port the communication.
