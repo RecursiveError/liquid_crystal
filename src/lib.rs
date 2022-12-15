@@ -1,14 +1,17 @@
 #![no_std]
 
 pub mod interfaces;
+pub mod fast_config;
 
 pub use interfaces::*;
+pub use fast_config::*;
 use embedded_hal::blocking::delay::DelayUs;
 
 //TODO: set all functions code
 #[repr(u8)]
 pub enum Commands{
     Clear = 0x01,
+    Reset = 0x02,
     EntryMode = 0x06,
     LiquidCristalOff = 0x08,
     Fun4bits1line = 0x20,
@@ -92,11 +95,7 @@ impl<'interface,T> LiquidCristal<'interface,T>
         delay.delay_us(160);
         self.send4bits(delay, 0x02 << 4);
         delay.delay_us(10000);
-
-        //configura o LiquidCristal
-        self.write(delay, SendType::Command(Fun4bits2line))
-            .write(delay, SendType::Command(CursorOff))
-            .write(delay, SendType::Command(Clear))
+        self
     }
 
     pub fn set_cursor<D: DelayUs<u16>>(&mut self, delay: &mut D,line: u8, colum: u8) -> &mut Self{
@@ -110,5 +109,12 @@ impl<'interface,T> LiquidCristal<'interface,T>
         self
     }
 
-
+    pub fn fast_config<D: DelayUs<u16>>(&mut self, delay: &mut D, config: FastConfig){
+        self.send(delay,0b0000_0100 | (config.entry_mode.0 as u8) | (config.entry_mode.1 as u8), 0x00);
+        self.send(delay,0b0000_1000 | (config.display.0 as u8) | (config.display.1 as u8)| (config.display.2 as u8), 0x00);
+        self.send(delay,0b0001_0000 | (config.write_config.0 as u8) | (config.write_config.1 as u8), 0x00);
+        self.send(delay,0b0010_0000 | (config.display_config.0 as u8) | (config.display_config.1 as u8) | (config.display_config.2 as u8), 0x00);
+        self.write(delay, SendType::Command(Commands::Clear))
+            .write(delay, SendType::Command(Commands::Reset));
+    }
 }
