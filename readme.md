@@ -123,4 +123,4 @@ connect the bits to their respective ports, and congratulations you have created
 
 I use lcd display for a long time, and I always had to rewrite the Drive when I need to use some port expander, because the current APIs don't provide a simple way to port the communication.
 
-this API is currently a personal test by embedded_hal, current syntax may change according to user feedback.
+this API is currently a personal test using embedded_hal, current syntax may change based on users feedback.
