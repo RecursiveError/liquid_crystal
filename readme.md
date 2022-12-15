@@ -22,7 +22,7 @@ First you must choose a display communication interface, this library provides t
 ```
 
 #### sending commands and text
-(this may change in the future, [see here](why-this-API?) )
+(this may change in the future, [see here](why-this-api) )
 
 first you must configure the display.
 
@@ -156,6 +156,6 @@ choose a variant from each configuration enum to create a display configuration
 
 ## why this API?
 
-I use lcd display for a long time, and I always had to rewrite the Drive when I need to use some port expander, because the current APIs don't provide a simple way to port the communication.
+I use lcd display for a long time, and I always had to rewrite the Drive when I need to use some IO expander, because the current APIs don't provide a simple way to port the communication.
 
 this API is currently a personal test using embedded_hal, current syntax may change based on users feedback.
