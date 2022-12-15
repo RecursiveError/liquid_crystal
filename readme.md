@@ -34,7 +34,7 @@ to send a command, pass a command from the [command list](#command-list) to the 
         .write(&mut delay,Text("hello World!"));
 ```
 ### Exemple
-exemple/stm32f1xx/hello.rs
+[exemple/stm32f1xx/hello.rs](https://github.com/RecursiveError/liquid_crystal/blob/main/exemples/stm32f1xx/hello.rs)
 
 ```rust
 #![deny(unsafe_code)]
