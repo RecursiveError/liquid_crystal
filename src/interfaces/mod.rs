@@ -5,6 +5,7 @@ use embedded_hal::blocking::i2c::Write;
 pub const EN:u8 = 0b00000100;
 pub const _RW:u8 = 0b00000010;// NO READ FUNCTION
 pub const RS:u8 = 0b00000001;
+pub const I2C_ADDRESS:u8 = 0x27;
 
 pub trait Interface{
     fn send(&mut self, data:u8);
