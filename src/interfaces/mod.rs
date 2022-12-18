@@ -104,20 +104,20 @@ where
 
     }
 
-struct I2C<T: Write>{
+pub struct I2C<T: Write>{
     i2c_bus: T,
     addr: u8,
 }
 
 impl<T: Write> I2C<T> {
-    fn new(i2c_bus:T, addr: u8) -> I2C<T>{
+    pub fn new(i2c_bus:T, addr: u8) -> I2C<T>{
         I2C {i2c_bus, addr}
     }
 }
 
 impl<T: Write> Interface for I2C<T> {
     fn send(&mut self, data:u8) {
-        self.i2c_bus.write(self.addr, &[data]);
+        self.i2c_bus.write(self.addr, &[data | 0x08]);
     }
 }
 
