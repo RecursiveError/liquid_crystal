@@ -25,7 +25,7 @@ fn main() -> ! {
 
 
     let mut gpiob = dp.GPIOB.split();
-    //pinos aleatorios para testes
+    
     let scl = gpiob.pb6.into_alternate_open_drain(&mut gpiob.crl);
     let sda = gpiob.pb7.into_alternate_open_drain(&mut gpiob.crl);
 
