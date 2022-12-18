@@ -10,7 +10,7 @@
 use panic_halt as _;
 use cortex_m_rt::entry;
 use stm32f1xx_hal::{pac, prelude::*,i2c::{BlockingI2c, DutyCycle, Mode}};
-use liquid_crystal::{Commands::*, SendType::* , LiquidCristal, DEFALT_CONFIG};
+use liquid_crystal::{Commands::*, SendType::* , LiquidCristal, DEFALT_CONFIG, I2C_ADDRESS};
 use liquid_crystal::I2C as I2C_interface;
 
 #[entry]
@@ -25,7 +25,7 @@ fn main() -> ! {
 
 
     let mut gpiob = dp.GPIOB.split();
-    
+
     let scl = gpiob.pb6.into_alternate_open_drain(&mut gpiob.crl);
     let sda = gpiob.pb7.into_alternate_open_drain(&mut gpiob.crl);
 
@@ -44,7 +44,7 @@ fn main() -> ! {
         1000,
     );
 
-    let mut interface = I2C_interface::new(i2c,0x27);
+    let mut interface = I2C_interface::new(i2c,I2C_ADDRESS);
     let mut lcd = LiquidCristal::new(&mut interface);
 
     let mut delay = cp.SYST.delay(&clocks);
