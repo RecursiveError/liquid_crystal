@@ -109,6 +109,7 @@ to create your own interface, you must implement the "Interface" Trait which con
 | `DATA7` | `DATA6`| `DATA5`| `DATA4` | `Reserved` | `ENABLE` | `READ_WRITE` | `REGISTER_SELECT` |
 
 (still no function to read, so keep the READ_WRITE pin in pull down)
+(`Reserved`corresponds to the display backlight in the I2C module)
 
 where 0 and 1 represent the state of the pin
 1: HIGH
