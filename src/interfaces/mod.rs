@@ -117,7 +117,7 @@ impl<T: Write> I2C<T> {
 
 impl<T: Write> Interface for I2C<T> {
     fn send(&mut self, data:u8) {
-        self.i2c_bus.write(self.addr, &[data | 0x08]);
+        self.i2c_bus.write(self.addr, &[data | 0x08]); //0x08 (0b0000_1000) corresponds to the display backlight in the I2C module
     }
 }
 
