@@ -12,10 +12,11 @@ use embedded_hal::blocking::delay::DelayUs;
 pub enum Commands{
     Clear = 0x01,
     Reset = 0x02,
-    EntryMode = 0x06,
     LiquidCristalOff = 0x08,
-    Fun4bits1line = 0x20,
-    Fun4bits2line = 0x28,
+    ShiftCursotLeft = 0x10,
+    ShiftCursotRight = 0x14,
+    ShiftDisplayLeft = 0x18,
+    ShiftDisplayRight = 0x1C,
     CursorOn = 0x0E,
     CursorOff = 0x0C,
     CursorBlink = 0x0F,
@@ -69,7 +70,7 @@ impl<'interface,T> LiquidCristal<'interface,T>
         if rs_state != 0 {
             delay.delay_us(5); // Minimal time between consequent data writes is ~1 uS
         }else{
-            delay.delay_us(2000); //generic command execution time is ~40 uS, but CLEAR or HOME command execution time is 1.5mS
+            delay.delay_us(2000); //generic command execution time is ~40 uS, but Clear or Reset command execution time is 1.5mS
         }
     }
 
@@ -133,7 +134,6 @@ impl<'interface,T> LiquidCristal<'interface,T>
     pub fn fast_config<D: DelayUs<u16>>(&mut self, delay: &mut D, config: FastConfig){
         self.send(delay,0b0000_0100 | (config.entry_mode.0 as u8) | (config.entry_mode.1 as u8), 0x00);
         self.send(delay,0b0000_1000 | (config.display.0 as u8) | (config.display.1 as u8)| (config.display.2 as u8), 0x00);
-        self.send(delay,0b0001_0000 | (config.write_config.0 as u8) | (config.write_config.1 as u8), 0x00);
         self.send(delay,0b0010_0000 | (config.display_config.0 as u8) | (config.display_config.1 as u8) | (config.display_config.2 as u8), 0x00);
         self.write(delay, SendType::Command(Commands::Clear))
             .write(delay, SendType::Command(Commands::Reset));
