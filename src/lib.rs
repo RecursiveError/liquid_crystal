@@ -51,49 +51,53 @@ impl<'interface,T> LiquidCristal<'interface,T>
         LiquidCristal{interface}
     }
 
-    //envia os dados em 2 pacotes de 4bits
+    //send data in 2 packages of 4bits
     fn send4bits<D: DelayUs<u16>>(&mut self, delay: &mut D, data:u8){
         self.interface.send(data);
         self.interface.send(data | EN);
-        delay.delay_us(5);
+        delay.delay_us(5); //pulse time need to be >450nS
         self.interface.send(data);
         delay.delay_us(5);
     }
 
-    //trata os bits antes de enviar para send4bits
+    //processes the data before sending it to
     pub fn send<D: DelayUs<u16>>(&mut self,delay: &mut D,  data:u8, rs_state: u8){
         let high_bits = ((data) & 0xF0) | rs_state;
         let low_bits = ((data << 4) & 0xF0) | rs_state; 
         self.send4bits(delay, high_bits);
         self.send4bits(delay, low_bits);
+        if rs_state != 0 {
+            delay.delay_us(5); // Minimal time between consequent data writes is ~1 uS
+        }else{
+            delay.delay_us(2000); //generic command execution time is ~40 uS, but CLEAR or HOME command execution time is 1.5mS
+        }
     }
 
-    //envia dados para o LiquidCristal
+    //send data for the display
     pub fn write<'s, D:DelayUs<u16>>(&mut self,delay: &mut D, data: SendType<'s>) -> &mut Self{
         match data {
             SendType::Command(x) =>{
                 self.send(delay, x as u8, 0x00);
-                 delay.delay_us(2000);
             }
             SendType::Text(x) => {
                 for text in x.chars(){
                     self.send(delay, text as u8, RS);
-                    delay.delay_us(80);
                 }
             }
             SendType::CustomChar(slot) => {
                 if slot < 7 {
                     self.send(delay, slot, RS);
-                    delay.delay_us(80);
                 }
             }
         };
         self
     }
 
-    //inicia o LiquidCristal
     pub fn init<D: DelayUs<u16>>(&mut self, delay: &mut D) -> &mut Self{
-        //inicia o modo 4bits
+        
+        delay.delay_us(150); //wait the delay init
+        
+        //start 4bits mode
         self.send4bits(delay, 0x03 << 4); 
         delay.delay_us(5000);
         self.send4bits(delay, 0x03 << 4);
@@ -119,7 +123,6 @@ impl<'interface,T> LiquidCristal<'interface,T>
     pub fn custom_char<D: DelayUs<u16>>(&mut self, delay: &mut D, char_array: &[u8;8], slot: u8){
         if slot < 7{
             self.send(delay, 0x40 | (slot<<3) , 0x00);
-            delay.delay_us(2000);
             for c in 0..8{
                 self.send(delay, char_array[c], RS);
             }
