@@ -28,6 +28,7 @@ pub use Commands::*;
 pub enum SendType<'s>{
     Command(Commands),
     Text(&'s str),
+    CustomChar(u8),
 }
 
 
@@ -80,6 +81,12 @@ impl<'interface,T> LiquidCristal<'interface,T>
                     delay.delay_us(80);
                 }
             }
+            SendType::CustomChar(slot) => {
+                if slot < 7 {
+                    self.send(delay, slot, RS);
+                    delay.delay_us(80);
+                }
+            }
         };
         self
     }
@@ -107,6 +114,17 @@ impl<'interface,T> LiquidCristal<'interface,T>
 
         self.send(delay,bits, 0x00);
         self
+    }
+
+    pub fn custom_char<D: DelayUs<u16>>(&mut self, delay: &mut D, char_array: &[u8;8], slot: u8){
+        if slot < 7{
+            self.send(delay, 0x40 | (slot<<3) , 0x00);
+            delay.delay_us(2000);
+            for c in 0..8{
+                self.send(delay, char_array[c], RS);
+            }
+        }
+        self.write(delay, SendType::Command(Reset));
     }
 
     pub fn fast_config<D: DelayUs<u16>>(&mut self, delay: &mut D, config: FastConfig){
