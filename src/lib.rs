@@ -86,7 +86,7 @@ impl<'interface,T> LiquidCristal<'interface,T>
                 }
             }
             SendType::CustomChar(slot) => {
-                if slot < 7 {
+                if slot < 8 {
                     self.send(delay, slot, RS);
                 }
             }
@@ -122,7 +122,7 @@ impl<'interface,T> LiquidCristal<'interface,T>
     }
 
     pub fn custom_char<D: DelayUs<u16>>(&mut self, delay: &mut D, char_array: &[u8;8], slot: u8){
-        if slot < 7{
+        if slot < 8{
             self.send(delay, 0x40 | (slot<<3) , 0x00);
             for c in 0..8{
                 self.send(delay, char_array[c], RS);
