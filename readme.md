@@ -124,16 +124,18 @@ connect the bits to their respective ports, and congratulations you have created
 
 ## command list
 
-- Clear
-- EntryMode
-- LiquidCristalOff
-- Fun4bits1line
-- Fun4bits2line
-- CursorOn
-- CursorOff
-- CursorBlink
-- MoveLine1
-- MoveLine2
+- Clear = 0x01,
+-    Reset
+-    LiquidCristalOff
+-    ShiftCursotLeft
+-    ShiftCursotRight
+-    ShiftDisplayLeft
+-    ShiftDisplayRight
+-    CursorOn
+-    CursorOff
+-    CursorBlink
+-    MoveLine1
+-    MoveLine2 
 
 (working on the documentation for the commands)
 
