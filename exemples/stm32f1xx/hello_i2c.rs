@@ -10,7 +10,7 @@
 use panic_halt as _;
 use cortex_m_rt::entry;
 use stm32f1xx_hal::{pac, prelude::*,i2c::{BlockingI2c, DutyCycle, Mode}};
-use liquid_crystal::{Commands::*, SendType::* , LiquidCristal, DEFALT_CONFIG, I2C_ADDRESS};
+use liquid_crystal::{Commands::*, SendType::* , LiquidCristal, DEFAULT_CONFIG, I2C_ADDRESS};
 use liquid_crystal::I2C as I2C_interface;
 
 #[entry]
@@ -50,7 +50,7 @@ fn main() -> ! {
     let mut delay = cp.SYST.delay(&clocks);
     
     lcd.init(&mut delay);
-    lcd.fast_config(&mut delay, DEFALT_CONFIG);
+    lcd.fast_config(&mut delay, DEFAULT_CONFIG);
 
     lcd.write(&mut delay,Text("hello World!"))
         .write(&mut delay,Command(MoveLine2))

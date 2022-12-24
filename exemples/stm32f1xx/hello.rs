@@ -10,7 +10,7 @@ use liquid_crystal::{Commands, SendType , LiquidCristal};
 use Commands::*;
 use SendType::*;
 use liquid_crystal::Parallel;
-use liquid_crystal::DEFALT_CONFIG;
+use liquid_crystal::DEFAULT_CONFIG;
 
 #[entry]
 fn main() -> ! {
@@ -38,7 +38,7 @@ fn main() -> ! {
     let mut lcd = LiquidCristal::new(&mut lcd_interface);
     
     lcd.init(&mut delay);
-    lcd.fast_config(&mut delay, DEFALT_CONFIG);
+    lcd.fast_config(&mut delay, DEFAULT_CONFIG);
     
     lcd.write(&mut delay,Text("hello World!"))
         .write(&mut delay,Command(MoveLine2))
