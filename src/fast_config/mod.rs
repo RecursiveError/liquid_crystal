@@ -51,7 +51,7 @@ pub struct FastConfig{
     pub display_config: (Bits,DisplayLines,CharSize),
 }
 
-pub const DEFALT_CONFIG:FastConfig = FastConfig{
+pub const DEFAULT_CONFIG:FastConfig = FastConfig{
     entry_mode: (ShiftConfig::Decrement, ShiftState::Off),
     display: (Display::On, Cursor::On, Blink::On),
     display_config: (Bits::Four, DisplayLines::Two, CharSize::C5X8),
