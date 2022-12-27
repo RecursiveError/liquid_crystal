@@ -1,3 +1,6 @@
+//! # liquidCrystal
+//! a library to work with alphanumeric lcd display compatible with the HD44780 controller
+
 #![no_std]
 
 pub mod interfaces;
@@ -7,7 +10,7 @@ pub use interfaces::*;
 pub use fast_config::*;
 use embedded_hal::blocking::delay::DelayUs;
 
-//TODO: set all functions code
+/// Enum of possible commands for SendType::Command
 #[repr(u8)]
 pub enum Commands{
     Clear = 0x01,
@@ -25,7 +28,7 @@ pub enum Commands{
 
 }
 pub use Commands::*;
-
+///enum of possible values ​​that can be written with the "write" function
 pub enum SendType<'s>{
     Command(Commands),
     Text(&'s str),
@@ -33,10 +36,7 @@ pub enum SendType<'s>{
 }
 
 
-/*TODO
-CREATE 8BITS MODE
-set cursor function
-*/
+
 pub struct LiquidCristal<'interface, T> 
 where 
     T: Interface,  
@@ -48,11 +48,12 @@ impl<'interface,T> LiquidCristal<'interface,T>
     where 
         T: Interface, 
     {
+    ///create a new display
     pub fn new(interface: &'interface mut T) -> LiquidCristal<'interface, T>{
         LiquidCristal{interface}
     }
 
-    //send data in 2 packages of 4bits
+    ///send data in 2 packages of 4bits
     fn send4bits<D: DelayUs<u16>>(&mut self, delay: &mut D, data:u8){
         self.interface.send(data);
         self.interface.send(data | EN);
@@ -61,7 +62,11 @@ impl<'interface,T> LiquidCristal<'interface,T>
         delay.delay_us(5);
     }
 
-    //processes the data before sending it to
+    /// ### low level function to send data.
+    /// processes the data before sending it to send4bits.
+    /// `rs_state` represents the state of the RS pin of the display 
+    /// (0x01 write) 
+    /// (0x00 command)
     pub fn send<D: DelayUs<u16>>(&mut self,delay: &mut D,  data:u8, rs_state: u8){
         let high_bits = ((data) & 0xF0) | rs_state;
         let low_bits = ((data << 4) & 0xF0) | rs_state; 
@@ -74,7 +79,24 @@ impl<'interface,T> LiquidCristal<'interface,T>
         }
     }
 
-    //send data for the display
+    /// ### write on the display
+    /// # Exemple
+    /// to send Text
+    /// ```
+    /// write(&mut delay,Text("Text"))
+    /// ```
+    /// to send Command
+    /// 
+    /// ```
+    ///  write(&mut delay,Command(Command))
+    /// ```
+    /// 
+    /// to send custom char
+    /// 
+    /// ```
+    ///  write(&mut delay, CustomChar(slot))
+    /// ```
+    /// 
     pub fn write<'s, D:DelayUs<u16>>(&mut self,delay: &mut D, data: SendType<'s>) -> &mut Self{
         match data {
             SendType::Command(x) =>{
@@ -93,7 +115,7 @@ impl<'interface,T> LiquidCristal<'interface,T>
         };
         self
     }
-
+    /// ### starts communication with the display
     pub fn init<D: DelayUs<u16>>(&mut self, delay: &mut D) -> &mut Self{
         
         delay.delay_us(150); //wait the delay init
@@ -110,6 +132,8 @@ impl<'interface,T> LiquidCristal<'interface,T>
         self
     }
 
+    /// ### moves the cursor to the indicated location.
+    /// receives the line and column position and moves the cursor
     pub fn set_cursor<D: DelayUs<u16>>(&mut self, delay: &mut D,line: u8, colum: u8) -> &mut Self{
         let bits = if line == 1{
             (MoveLine1 as u8) + (0b0011_1111 & colum)
@@ -121,6 +145,8 @@ impl<'interface,T> LiquidCristal<'interface,T>
         self
     }
 
+    /// ### create custom characters
+    /// attention: this function resets the internal variables of the display.
     pub fn custom_char<D: DelayUs<u16>>(&mut self, delay: &mut D, char_array: &[u8;8], slot: u8){
         if slot < 8{
             self.send(delay, 0x40 | (slot<<3) , 0x00);
@@ -130,7 +156,7 @@ impl<'interface,T> LiquidCristal<'interface,T>
         }
         self.write(delay, SendType::Command(Reset));
     }
-
+    /// ### loads the configuration struct to the display
     pub fn fast_config<D: DelayUs<u16>>(&mut self, delay: &mut D, config: FastConfig){
         self.send(delay,0b0000_0100 | (config.entry_mode.0 as u8) | (config.entry_mode.1 as u8), 0x00);
         self.send(delay,0b0000_1000 | (config.display.0 as u8) | (config.display.1 as u8)| (config.display.2 as u8), 0x00);
