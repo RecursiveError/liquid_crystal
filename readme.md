@@ -44,6 +44,23 @@ to send a command, pass a command from the [command list](#command-list) to the 
     lcd.write(&mut delay,Command(Clear))
         .write(&mut delay,Text("hello World!"));
 ```
+
+you can send custom characters to variant "CustomChar", but first you need to create your custom character by function "custom_char", this function receives delay like all others, a reference to an array of u8 with size 8, and the slot that he will occupy
+
+- [how does custom characters work?](https://www.engineersgarage.com/making-custom-characters-on-lcd-using-arduino/)
+- [custom character generator](https://maxpromer.github.io/LCD-Character-Creator/)
+
+HD44780 allows you to create 8 custom characters (slot 0 - 7), you can create and modify these slots at any time, but only 8 different characters can be written at the same time on the display. (creating these characters returns the display to its initial position, then use "set_cursor" after creating these characters)
+
+to send use the CustomChar variant with the character slot:
+
+```rust
+    let lightning: [u8; 8] = [0x03, 0x06, 0x0C, 0x1F, 0x1F, 0x03, 0x06, 0x0C];
+
+    lcd.custom_char(&mut delay, &lightning, 0);
+    lcd.write(&mut delay, CustomChar(0));
+```
+
 ### Exemple
 [exemple/stm32f1xx/hello.rs](https://github.com/RecursiveError/liquid_crystal/blob/main/exemples/stm32f1xx/hello.rs)
 
