@@ -3,6 +3,8 @@ name = "liquid_crystal"
 authors = ["guilherme Silva Schultz <guilhermeSschultz.contato@gmail.com>"]
 version = "0.1.0"
 edition = "2021"
+description = "a library to work with alphanumeric lcd display compatible with the HD44780 controller"
+license = "MIT"
 
 
 [dependencies]
