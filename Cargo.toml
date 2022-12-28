@@ -5,11 +5,11 @@ version = "0.1.0"
 edition = "2021"
 description = "a library to work with alphanumeric lcd display compatible with the HD44780 controller"
 license = "MIT"
+repository = "https://github.com/RecursiveError/liquid_crystal"
 
 
 [dependencies]
 embedded-hal = "0.2.7"
-nb = "1"
 
 [toolchain]
 channel = "nightly"
