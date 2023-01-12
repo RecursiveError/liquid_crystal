@@ -11,7 +11,7 @@ pub trait Interface{
     fn send(&mut self, config: u8, data:u8);
 }
 
-/*
+
 pub struct Parallel<D1,D2,D3,D4,RS,EN>
     where
         D1: OutputPin,
@@ -20,6 +20,7 @@ pub struct Parallel<D1,D2,D3,D4,RS,EN>
         D4: OutputPin,
         RS: OutputPin,
         EN: OutputPin,
+
     {
     d1: D1,
     d2: D2,
@@ -59,52 +60,45 @@ where
     RS: OutputPin,
     EN: OutputPin,
     {
-        fn send(&mut self, data:u8) {
-            let data_value = (data & 0xF0) >> 4;
-            let en_std = data & EN;
-            let rs_std = data & RS;
-
-            //check Regista Select pin
-            if rs_std != 0{
-                self.rs.set_high();
-            }else{
-                self.rs.set_low();
-            }
-            
-            //check data pins
-            if (data_value & (0b0001)) != 0{
+        fn send(&mut self, config:u8, data:u8) {
+            if (data & 0b0001_0000) != 0{
                 self.d1.set_high();
             }else{
                 self.d1.set_low();
             }
 
-            if (data_value & (0b0010)) != 0{
+            if (data & 0b0010_0000) != 0{
                 self.d2.set_high();
             }else{
                 self.d2.set_low();
             }
 
-            if (data_value & (0b0100)) != 0{
+            if (data & 0b0100_0000) != 0{
                 self.d3.set_high();
             }else{
                 self.d3.set_low();
             }
 
-            if (data_value & (0b1000)) != 0{
+            if (data & 0b1000_0000) != 0{
                 self.d4.set_high();
             }else{
                 self.d4.set_low();
             }
 
-            //check enable pin
-            if en_std != 0{
+            if (config & 0b0000_0001) != 0{
+                self.rs.set_high();
+            }else {
+                self.rs.set_low();
+            }
+
+            if (config & 0b0000_0100) != 0{
                 self.en.set_high();
-            }else{
+            }else {
                 self.en.set_low();
             }
-        }
 
-    }*/
+        }
+    }
 
 pub struct I2C<T: Write>{
     i2c_bus: T,
