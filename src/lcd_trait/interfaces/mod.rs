@@ -3,6 +3,7 @@
 pub mod dummy;
 use embedded_hal::digital::v2::OutputPin;
 use embedded_hal::blocking::i2c::Write;
+
 pub const EN:u8 = 0b00000100;
 pub const _RW:u8 = 0b00000010;// NO READ FUNCTION
 pub const RS:u8 = 0b00000001;
@@ -125,7 +126,7 @@ impl<T: Write> I2C<T> {
 
 impl<T:Write> Interface for I2C<T> {
     fn send(&mut self, config: u8, data:u8) {
-        let byte = (config & 0b0000_0111) | data; //ignores possible additional Enables, i2C Module does not support multiple displays
-        self.i2c_bus.write(self.addr, &[byte | 0x08]); //0x08 (0b0000_1000) corresponds to the display backlight in the I2C module
+        let byte = (config & 0b00000111) | (data & 0xF0) | 0x08; //ignores possible additional Enables, i2C Module does not support multiple displays
+        self.i2c_bus.write(self.addr, &[byte]); //0x08 (0b0000_1000) corresponds to the display backlight in the I2C module
     }
 }

@@ -4,8 +4,5 @@
 
 pub mod prelude;
 pub mod lcd_trait;
-pub mod lcd_bus;
-
-pub use lcd_bus::*;
 pub use lcd_trait::*;
 pub use prelude::*;
