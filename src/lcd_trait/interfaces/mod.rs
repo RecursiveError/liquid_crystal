@@ -1,4 +1,6 @@
 #![allow(unused)]
+
+pub mod dummy;
 use embedded_hal::digital::v2::OutputPin;
 use embedded_hal::blocking::i2c::Write;
 
@@ -8,10 +10,11 @@ pub const RS:u8 = 0b00000001;
 pub const I2C_ADDRESS:u8 = 0x27;
 
 pub trait Interface{
-    fn send(&mut self, data:u8);
+    fn send(&mut self, config: u8, data:u8);
 }
 
-pub struct Parallel<D1,D2,D3,D4,RS,EN>
+
+pub struct Parallel<D1,D2,D3,D4,RS,EN,EN2>
     where
         D1: OutputPin,
         D2: OutputPin,
@@ -19,6 +22,8 @@ pub struct Parallel<D1,D2,D3,D4,RS,EN>
         D4: OutputPin,
         RS: OutputPin,
         EN: OutputPin,
+        EN2: OutputPin,
+
     {
     d1: D1,
     d2: D2,
@@ -26,9 +31,10 @@ pub struct Parallel<D1,D2,D3,D4,RS,EN>
     d4: D4,
     rs: RS,
     en: EN,
+    en2: EN2,
 }
 
-impl<D1,D2,D3,D4,RS,EN> Parallel<D1,D2,D3,D4,RS,EN>
+impl<D1,D2,D3,D4,RS,EN,EN2> Parallel<D1,D2,D3,D4,RS,EN,EN2>
     where
     D1: OutputPin,
     D2: OutputPin,
@@ -36,8 +42,9 @@ impl<D1,D2,D3,D4,RS,EN> Parallel<D1,D2,D3,D4,RS,EN>
     D4: OutputPin,
     RS: OutputPin,
     EN: OutputPin,
+    EN2: OutputPin,
     {
-    pub fn new(d1: D1, d2: D2,d3: D3, d4:D4, rs:RS, en: EN)-> Parallel<D1,D2,D3,D4,RS,EN>{
+    pub fn new(d1: D1, d2: D2,d3: D3, d4:D4, rs:RS, en: EN, en2: EN2)-> Parallel<D1,D2,D3,D4,RS,EN,EN2>{
         Parallel{
             d1,
             d2,
@@ -45,11 +52,12 @@ impl<D1,D2,D3,D4,RS,EN> Parallel<D1,D2,D3,D4,RS,EN>
             d4,
             rs,
             en,
+            en2,
         }
     }
 }
 
-impl<D1,D2,D3,D4,RS,EN> Interface for Parallel<D1,D2,D3,D4,RS,EN>
+impl<D1,D2,D3,D4,RS,EN,EN2> Interface for Parallel<D1,D2,D3,D4,RS,EN,EN2>
 where
     D1: OutputPin,
     D2: OutputPin,
@@ -57,52 +65,52 @@ where
     D4: OutputPin,
     RS: OutputPin,
     EN: OutputPin,
+    EN2:OutputPin,
     {
-        fn send(&mut self, data:u8) {
-            let data_value = (data & 0xF0) >> 4;
-            let en_std = data & EN;
-            let rs_std = data & RS;
-
-            //check Regista Select pin
-            if rs_std != 0{
-                self.rs.set_high();
-            }else{
-                self.rs.set_low();
-            }
-            
-            //check data pins
-            if (data_value & (0b0001)) != 0{
+        fn send(&mut self, config:u8, data:u8) {
+            if (data & 0b0001_0000) != 0{
                 self.d1.set_high();
             }else{
                 self.d1.set_low();
             }
 
-            if (data_value & (0b0010)) != 0{
+            if (data & 0b0010_0000) != 0{
                 self.d2.set_high();
             }else{
                 self.d2.set_low();
             }
 
-            if (data_value & (0b0100)) != 0{
+            if (data & 0b0100_0000) != 0{
                 self.d3.set_high();
             }else{
                 self.d3.set_low();
             }
 
-            if (data_value & (0b1000)) != 0{
+            if (data & 0b1000_0000) != 0{
                 self.d4.set_high();
             }else{
                 self.d4.set_low();
             }
 
-            //check enable pin
-            if en_std != 0{
+            if (config & 0b0000_0001) != 0{
+                self.rs.set_high();
+            }else {
+                self.rs.set_low();
+            }
+
+            if (config & 0b0000_0100) != 0{
                 self.en.set_high();
-            }else{
+            }else {
                 self.en.set_low();
             }
-        }
 
+            if (config & 0b0000_1000) != 0{
+                self.en2.set_high();
+            }else {
+                self.en2.set_low();
+            }
+
+        }
     }
 
 pub struct I2C<T: Write>{
@@ -116,9 +124,9 @@ impl<T: Write> I2C<T> {
     }
 }
 
-impl<T: Write> Interface for I2C<T> {
-    fn send(&mut self, data:u8) {
-        self.i2c_bus.write(self.addr, &[data | 0x08]); //0x08 (0b0000_1000) corresponds to the display backlight in the I2C module
+impl<T:Write> Interface for I2C<T> {
+    fn send(&mut self, config: u8, data:u8) {
+        let byte = (config & 0b00000111) | (data & 0xF0) | 0x08; //ignores possible additional Enables, i2C Module does not support multiple displays
+        self.i2c_bus.write(self.addr, &[byte]); //0x08 (0b0000_1000) corresponds to the display backlight in the I2C module
     }
 }
-

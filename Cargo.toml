@@ -1,9 +1,9 @@
 [package]
 name = "liquid_crystal"
 authors = ["guilherme Silva Schultz <guilhermeSschultz.contato@gmail.com>"]
-version = "0.1.2"
+version = "0.1.4"
 edition = "2021"
-description = "a library to work with alphanumeric lcd display compatible with the HD44780 controller"
+description = "a customizable library to work with alphanumeric lcd display compatible with the HD44780 controller"
 license = "MIT"
 repository = "https://github.com/RecursiveError/liquid_crystal"
 keywords = ["lcd", "liquidcrystal", "HD44780", "embedded-hal"]
@@ -12,6 +12,3 @@ categories = ["embedded", "hardware-support", "no-std"]
 
 [dependencies]
 embedded-hal = "0.2.7"
-
-[toolchain]
-channel = "nightly"
