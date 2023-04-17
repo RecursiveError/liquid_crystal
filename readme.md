@@ -163,16 +163,50 @@ connect the bits to their respective ports, and congratulations you have created
 
 ## command list
 
--    Clear
--    Reset
--    ShiftCursotLeft
--    ShiftCursotRight
--    ShiftDisplayLeft
--    ShiftDisplayRight
--    MoveLine1
--    MoveLine2
+`Clear` Clears the display
 
-(working on the documentation for the commands)
+`Reset` resets the display's internal variables
+
+`ShiftCursotLeft` Moves the cursor to the left
+
+`ShiftCursotRight` Moves the cursor to the right
+
+`ShiftDisplayLeft` Moves the display left
+
+`ShiftDisplayRight` Moves the display right
+
+`MoveLine1` moves the cursor to the beginning of the first line of the controller
+
+`MoveLine2` moves the cursor to the beginning of the second line of the controller
+
+
+## configuration functions
+
+`echo` enable all displays
+
+`select_lcd` select a display (0 = EN1 | 1 = EN2)
+
+`enable_blink` enable blinking cursor
+
+`enable_cursor` enable cursor
+
+`enable_display` enable display
+
+`enable_autoscroll` enable autoscroll
+
+`disable_blink` disable blinking cursor
+
+`disable_cursor` disable cursor
+
+`disable_display` disable display
+
+`disable_autoscroll` disable autoscroll
+
+`set_autoscroll_increment` autoscroll increments position
+
+`set_autoscroll_decrement` autoscroll decrements position
+
+`update_config` send the configs to the display
 
 ## layouts
 
