@@ -20,7 +20,19 @@ pub enum SendType<'s>{
 
 pub enum BusBits{
     Bus4Bits,
-    Bus8Bits
+    Bus8Bits,
+}
+
+enum LCDEntryMode{
+    LCDShiftMode = 0x01,
+    LCDDirection = 0x02,
+}
+
+enum LCDDisplayControl{
+    LCDBlink = 0x01,
+    LCDCursor = 0x02,
+    LCDDisplay = 0x04,
+
 }
 
 pub struct LiquidCrystal<'interface, T:Interface, const COLS: u8, const LINES: usize>{
@@ -28,6 +40,8 @@ pub struct LiquidCrystal<'interface, T:Interface, const COLS: u8, const LINES: u
     corrent_enable: u8,
     bus: BusBits,
     layout: Layout<COLS, LINES>,
+    entry_mode: u8,
+    display_control:u8,
 }
 
 impl<'interface, T:Interface, const COLS: u8, const LINES: usize> LiquidCrystal<'interface, T, COLS, LINES>{
@@ -38,6 +52,8 @@ impl<'interface, T:Interface, const COLS: u8, const LINES: usize> LiquidCrystal<
             bus,
             layout,
             corrent_enable: 0b11,
+            entry_mode: 0x06, //shift Off, written from left to right
+            display_control: 0x0C //display on, cursor off, cursor blinking off
         }
     }
     fn send8bits<D: DelayUs<u16>>(&mut self,delay: &mut D,  data:u8, rs_state: u8){
@@ -91,8 +107,7 @@ impl<'interface, T:Interface, const COLS: u8, const LINES: usize> LiquidCrystal<
         };
         self.write(delay, SendType::Command(Clear));
         self.write(delay, SendType::Command(Reset));
-        self.send(delay, 0x06, 0);
-        self.send(delay, 0x0C, 0);
+        self.update_config(delay);
     }
 
     /// ### write on the display
@@ -154,16 +169,107 @@ impl<'interface, T:Interface, const COLS: u8, const LINES: usize> LiquidCrystal<
         self.write(delay, SendType::Command(Reset));
         self
     }
-
+    /// ### enable all displays
     pub fn echo(&mut self) -> &mut Self{
         self.corrent_enable = 0b11;
         self
     }
 
+    /// ### select a display
+    ///0 = EN1 | 1 = EN2
     pub fn select_lcd(&mut self, en: u8)-> &mut Self{
         if en < 2 {
         self.corrent_enable = 1<<en;
         }
         self
     }
+
+    /// ### enable blinking cursor
+    /// use update_config after configuration to apply changes!
+    #[inline]
+    pub fn enable_blink(&mut self)-> &mut Self{
+        self.display_control |= LCDDisplayControl::LCDBlink as u8;
+        self
+    }
+
+    /// ### enable cursor
+    /// use update_config after configuration to apply changes!
+    #[inline]
+    pub fn enable_cursor(&mut self)-> &mut Self{
+        self.display_control |= LCDDisplayControl::LCDCursor as u8;
+        self
+    }
+
+    /// ### enable display
+    /// use update_config after configuration to apply changes!
+    #[inline]
+    pub fn enable_display(&mut self)-> &mut Self{
+        self.display_control |= LCDDisplayControl::LCDDisplay as u8;
+        self
+    }
+
+    /// ### enable autoscroll
+    /// use update_config after configuration to apply changes!
+    #[inline]
+    pub fn enable_autoscroll(&mut self)-> &mut Self{
+        self.entry_mode |= LCDEntryMode::LCDShiftMode as u8;
+        self
+    }
+
+    /// ### disable blinking cursor
+    /// use update_config after configuration to apply changes!
+    #[inline]
+    pub fn disable_blink(&mut self)-> &mut Self{
+        self.display_control &= !(LCDDisplayControl::LCDBlink as u8);
+        self
+    }
+
+    /// ### disable cursor
+    /// use update_config after configuration to apply changes!
+    #[inline]
+    pub fn disable_cursor(&mut self)-> &mut Self{
+        self.display_control &= !(LCDDisplayControl::LCDCursor as u8);
+        self
+    }
+
+    /// ### disable display
+    /// use update_config after configuration to apply changes!
+    #[inline]
+    pub fn disable_display(&mut self)-> &mut Self{
+        self.display_control &= !(LCDDisplayControl::LCDDisplay as u8);
+        self
+    }
+
+    /// ### disable autoscroll
+    /// use update_config after configuration to apply changes!
+    #[inline]
+    pub fn disable_autoscroll(&mut self)-> &mut Self{
+        self.entry_mode &= !(LCDEntryMode::LCDShiftMode as u8);
+        self
+    }
+
+    /// ### autoscroll increments position
+    /// use update_config after configuration to apply changes!
+    #[inline]
+    pub fn set_autoscroll_increment(&mut self)-> &mut Self{
+        self.entry_mode |= LCDEntryMode::LCDDirection as u8;
+        self
+    }
+
+    /// ### autoscroll decrements position
+    /// use update_config after configuration to apply changes!
+    #[inline]
+    pub fn set_autoscroll_decrement(&mut self)-> &mut Self{
+        self.entry_mode &= !(LCDEntryMode::LCDDirection as u8);
+        self
+    }
+
+    /// ### send the configs to the display
+    pub fn update_config<D: DelayUs<u16>>(&mut self, delay: &mut D)-> &mut Self{
+        self.send(delay, self.display_control, 0);
+        self.send(delay, self.entry_mode, 0);
+        self
+    }
+
+
 }
