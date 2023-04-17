@@ -2,7 +2,6 @@ pub use embedded_hal::blocking::delay::DelayUs;
 pub use embedded_hal::blocking::delay::DelayMs;
 
 pub mod interfaces;
-pub mod fast_config;
 pub mod commands;
 pub mod layout;
 
