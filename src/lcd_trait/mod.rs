@@ -144,7 +144,7 @@ impl<'interface, T:Interface, const COLS: u8, const LINES: usize> LiquidCrystal<
 
     /// ### create custom characters
     /// attention: this function resets the internal variables of the display.
-    pub fn custom_char<D: DelayUs<u16>>(&mut self, delay: &mut D, char_array: &[u8;8], slot: u8){
+    pub fn custom_char<D: DelayUs<u16>>(&mut self, delay: &mut D, char_array: &[u8;8], slot: u8)->&mut Self{
         if slot < 8{
             self.send(delay, 0x40 | (slot<<3) , 0x00);
             for c in 0..8{
@@ -152,6 +152,18 @@ impl<'interface, T:Interface, const COLS: u8, const LINES: usize> LiquidCrystal<
             }
         }
         self.write(delay, SendType::Command(Reset));
+        self
     }
 
+    pub fn echo(&mut self) -> &mut Self{
+        self.corrent_enable = 0b11;
+        self
+    }
+
+    pub fn select_lcd(&mut self, en: u8)-> &mut Self{
+        if en < 2 {
+        self.corrent_enable = 1<<en;
+        }
+        self
+    }
 }
