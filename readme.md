@@ -149,7 +149,7 @@ The "send" function receives two u8 parameters, "data" and "config", in which th
 | CONFIG | Reserved | Reserved | Reserved | Reserved | EN2 | EN | R/W | RS |
 
 (still no function to read, so keep the R/W pin in pull down)
-(`Reserved`corresponds to the display backlight in the I2C module)
+(`EN2`corresponds to the display backlight in the I2C module)
 
 where 0 and 1 represent the state of the pin
 1: HIGH
