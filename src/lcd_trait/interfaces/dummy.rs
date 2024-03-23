@@ -1,10 +1,13 @@
-use embedded_hal::digital::v2::OutputPin;
+use core::convert::Infallible;
+use embedded_hal::digital::{ErrorType, OutputPin};
 
 pub struct Dummy;
 
-impl OutputPin for Dummy{
-    type Error = ();
+impl ErrorType for Dummy {
+    type Error = Infallible;
+}
 
+impl OutputPin for Dummy {
     fn set_high(&mut self) -> Result<(), Self::Error> {
         Ok(())
     }
