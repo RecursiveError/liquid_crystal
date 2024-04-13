@@ -20,8 +20,11 @@ finally you must choose a Layout
     let mut lcd_interface = Parallel::new(D4, D5, D6, D7, rs, en, en2);
     let mut lcd = LiquidCrystal::new(&mut interface, Bus4Bits, LCD16X2);
 ```
+(By default, the LCD implementation uses blocking delay,
+use the `async` method to create an LCD with async support, remember to enable async in the library features)
 
-(Not all interfaces support 8Bit communication, but all interfaces that support 8Bit can support 4Bitn)
+
+Not all interfaces support 8Bit communication, but all interfaces that support 8Bit can support 4Bit
 
 #### sending commands and text
 (this may change in the future, [see here](why-this-api) )
@@ -34,6 +37,7 @@ for this you must call the "begin" function.
 ```rust
     lcd.begin(&mut delay);
 ```
+
 
 you can send text and commands by the "write" function, this function receives a reference from a delay function and an Enum "SendType" which can be Text or Command
 
