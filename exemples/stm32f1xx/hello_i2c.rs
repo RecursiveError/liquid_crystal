@@ -10,7 +10,7 @@
 use panic_halt as _;
 use cortex_m_rt::entry;
 use stm32f1xx_hal::{pac, prelude::*,i2c::{BlockingI2c, DutyCycle, Mode}};
-use liquid_crystal::{prelude::*};
+use liquid_crystal::prelude::*;
 use liquid_crystal::I2C as I2C_interface;
 
 #[entry]
@@ -54,7 +54,7 @@ fn main() -> ! {
         1000,
     );
 
-    let mut interface = I2C_interface::new(i2c,I2C_ADDRESS);
+    let mut interface = I2C_interface::new(i2c,0x27);
     let mut lcd = LiquidCrystal::new(&mut interface, Bus4Bits, LCD16X2);
 
     let mut delay = cp.SYST.delay(&clocks);

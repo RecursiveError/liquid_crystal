@@ -7,6 +7,8 @@ use embedded_hal::digital::OutputPin;
 pub const EN: u8 = 0b00000100;
 pub const _RW: u8 = 0b00000010; // NO READ FUNCTION
 pub const RS: u8 = 0b00000001;
+
+#[deprecated(since="0.2.0", note="This address is only valid in the LCM1602 IIC module, just type 0x27 instead")]
 pub const I2C_ADDRESS: u8 = 0x27;
 
 pub trait Interface {
