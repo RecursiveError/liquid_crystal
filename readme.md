@@ -252,4 +252,9 @@ const LCD20X4: Layout<20,4> = Layout{
 
 I use lcd display for a long time, and I always had to rewrite the Drive when I need to use some IO expander, because the current APIs don't provide a simple way to port the communication.
 
-*this API is currently a personal test using embedded_hal, current syntax may change based on users feedback.
+this API is currently a personal test using embedded_hal, current syntax may change based on users feedback.
+
+- The "write" method may be separated into several functions, including new methods for writing data, just like its C++ version: "omnicrystal" (Arduino) and UniversalLCD
+
+- support for using reserved "config" bits for user customized functions is under review
+(the main idea of ​​this is in use of multi-colored displays)
