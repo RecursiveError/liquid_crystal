@@ -1,7 +1,7 @@
 [package]
 name = "liquid_crystal"
 authors = ["guilherme Silva Schultz <guilhermeSschultz.contato@gmail.com>"]
-version = "0.1.5"
+version = "0.2.0"
 edition = "2021"
 description = "a customizable library to work with alphanumeric lcd display compatible with the HD44780 controller"
 license = "MIT"
